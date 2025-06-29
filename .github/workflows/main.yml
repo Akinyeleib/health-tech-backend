@@ -6,11 +6,6 @@ on:
     branches:
       - main
 
-  # Runs on pull request events that target one of the below branches
-  pull_request:
-    branches:
-      - main
-
   # Allows you to run this workflow manually from the Actions tab of the repository
   workflow_dispatch:
 
@@ -34,9 +29,6 @@ env:
   # Ensures Python uses UTF-8 encoding by default
   PYTHONUTF8: 1
 
-  # Disables rich text formatting in Flet CLI output
-  FLET_CLI_NO_RICH_OUTPUT: 1
-
   # Disables progress bars when using UV
   UV_NO_PROGRESS: 1
 
@@ -53,15 +45,16 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Install flet-cli ${{ env.FLET_CLI_VERSION }}
+    - name: Install Dependencies ${{ env.FLET_CLI_VERSION }}
       run: |
         python -m pip install --upgrade pip
-        pip install flet-cli==$FLET_CLI_VERSION
+        pip install -r requirements.txt
 
     - name: Flet Build Web
       run: |
         echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}, USER: ${GITHUB_REPOSITORY%/}, PROJECT_BASE_URL: ${GITHUB_REPOSITORY#/}"
-        flet build web --base-url ${GITHUB_REPOSITORY#*/} --route-url-strategy hash
+        # flet build web --base-url ${GITHUB_REPOSITORY#*/} --route-url-strategy hash
+        python main.py --base-url ${GITHUB_REPOSITORY#*/} --route-url-strategy hash
 
     - name: Upload Artifact
       uses: actions/upload-pages-artifact@v3
